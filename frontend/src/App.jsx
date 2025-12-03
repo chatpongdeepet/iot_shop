@@ -30,7 +30,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
+        <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
           <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
             <main className="flex-grow pt-16">

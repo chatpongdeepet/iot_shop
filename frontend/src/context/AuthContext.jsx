@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api';
 
 const AuthContext = createContext(null);
 
@@ -9,17 +10,31 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (token) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
+        const fetchUser = async () => {
+            if (token) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                try {
+                    const response = await api.get('/auth/me');
+                    setUser(response.data);
+                    localStorage.setItem('user', JSON.stringify(response.data));
+                } catch (error) {
+                    console.error('Error fetching user:', error);
+                    // Optional: logout if token is invalid, but api.js interceptor might handle it
+                    if (error.response?.status === 401) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        setToken(null);
+                        setUser(null);
+                    }
+                }
+            } else {
+                delete axios.defaults.headers.common['Authorization'];
+                setUser(null);
             }
-        } else {
-            delete axios.defaults.headers.common['Authorization'];
-            setUser(null);
-        }
-        setLoading(false);
+            setLoading(false);
+        };
+
+        fetchUser();
     }, [token]);
 
     const login = (newToken, userData) => {

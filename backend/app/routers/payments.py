@@ -48,7 +48,7 @@ def create_checkout_session(current_user: models.User = Depends(get_current_user
             payment_method_types=['card'],
             line_items=line_items,
             mode='payment',
-            success_url=f'{FRONTEND_URL}/success',
+            success_url=f'{FRONTEND_URL}/success?session_id={{CHECKOUT_SESSION_ID}}',
             cancel_url=f'{FRONTEND_URL}/cancel',
             client_reference_id=str(current_user.id),
             metadata={
@@ -58,6 +58,18 @@ def create_checkout_session(current_user: models.User = Depends(get_current_user
         return {"url": checkout_session.url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/verify-session")
+def verify_session(session_id: str, db: Session = Depends(get_db)):
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+        if session.payment_status == 'paid':
+            handle_checkout_session(session, db)
+            return {"status": "success"}
+        else:
+            return {"status": "pending"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/webhook")
 async def stripe_webhook(request: Request, stripe_signature: str = Header(None), db: Session = Depends(get_db)):
