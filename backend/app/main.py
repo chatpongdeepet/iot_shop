@@ -1,22 +1,36 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from .database import engine, Base
+from .routers import auth, products, orders, analytics, cart, users, payments
+
+# Create tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# อนุญาตให้ React (ซึ่งมักจะรันที่ port 5173 หรือ 3000) เข้าถึง API ได้
+# Allow CORS
 origins = [
-    "http://localhost:5173", # Vite default port
-    "http://localhost:3000", # React Create App default port
+    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"], # อนุญาตทุก Method (GET, POST, PUT, DELETE)
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
+app.include_router(products.router)
+app.include_router(orders.router)
+app.include_router(analytics.router)
+app.include_router(cart.router)
+app.include_router(users.router)
+app.include_router(payments.router)
+
+
 @app.get("/")
 def read_root():
-    return {"message": "Hello from FastAPI"}
+    return {"message": "Welcome to IoT Shop API"}
