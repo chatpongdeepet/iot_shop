@@ -78,7 +78,7 @@ export default function ProductDetail() {
                                 <img
                                     src={product.images[selectedImageIndex]}
                                     alt={product.name}
-                                    className="h-full w-full object-cover"
+                                    className="h-full w-full object-contain"
                                 />
                             ) : (
                                 <span className="text-gray-400 text-xl">No Image Available</span>
