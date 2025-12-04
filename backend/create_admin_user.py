@@ -5,7 +5,7 @@ from app.auth_utils import get_password_hash
 def create_admin():
     db = SessionLocal()
     try:
-        email = "admin@admin.com"
+        email = "admin@email.com"
         password = "password1234"
         
         # Check if exists
