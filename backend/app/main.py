@@ -1,7 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from .database import engine, Base
 from .routers import auth, products, orders, analytics, cart, users, payments, upload
+
+# Enable PostGIS extension if not exists
+try:
+    with engine.connect() as connection:
+        connection.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
+        connection.commit()
+except Exception as e:
+    print(f"Warning: Could not enable PostGIS extension. Error: {e}")
 
 # Create tables
 Base.metadata.create_all(bind=engine)
