@@ -50,5 +50,21 @@ services:
     ports:
       - "8080:8080"
 
+  seed:
+    build: ./backend
+    container_name: iot_shop_seed
+    command: /bin/bash seed.sh
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      - backend
+    profiles:
+      - tools
+
 volumes:
   postgres_data:
