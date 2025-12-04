@@ -106,7 +106,7 @@ export default function ProductsList() {
                         {products.map((product) => (
                             <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                                 <Link to={`/product/${product.id}`} className="block">
-                                    <div className="h-48 bg-gray-200 flex items-center justify-center relative">
+                                    <div className="w-full bg-gray-200 flex items-center justify-center relative" style={{ aspectRatio: '4/3' }}>
                                         {product.images && product.images.length > 0 ? (
                                             <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
                                         ) : (
@@ -114,7 +114,9 @@ export default function ProductsList() {
                                         )}
                                     </div>
                                     <div className="p-4">
-                                        <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
+                                        <h2 className="text-xl font-semibold mb-2" title={product.name}>
+                                            {product.name.length > 15 ? `${product.name.substring(0, 15)}...` : product.name}
+                                        </h2>
                                         <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
                                         <div className="flex justify-between items-center">
                                             <span className="text-2xl font-bold text-blue-600">฿{product.price}</span>
