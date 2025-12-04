@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy Code ทั้งหมด (แต่ใน docker-compose เรา mount ทับอีกทีเพื่อความสะดวก)
 COPY . .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
