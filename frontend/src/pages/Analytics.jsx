@@ -284,7 +284,7 @@ export default function Analytics() {
                         />
                         {locations.features.map((feature, index) => {
                             const isVisitor = feature.properties.type === 'visitor_province';
-                            const color = isVisitor ? 'orange' : 'red';
+                            const color = isVisitor ? 'orange' : 'blue';
                             return (
                                 <CircleMarker
                                     key={index}

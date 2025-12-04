@@ -67,7 +67,7 @@ function App() {
               </Routes>
             </main>
             <CookieConsent />
-            <ToastContainer position="top-right" autoClose={2000} />
+            <ToastContainer position="top-right" autoClose={1500} />
           </div>
         </Router>
       </CartProvider>

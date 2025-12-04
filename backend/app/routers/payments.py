@@ -142,6 +142,10 @@ def handle_checkout_session(session, db: Session):
             price_at_time=item.product.price
         )
         db.add(order_item)
+        
+        # Decrement Stock
+        item.product.stock -= item.quantity
+        db.add(item.product)
     
     # Clear Cart
     for item in cart.items:

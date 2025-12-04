@@ -113,6 +113,11 @@ def get_order_locations(db: Session = Depends(get_db)):
         models.Address.province,
         func.count(models.Order.id).label("count")
     ).join(models.Order, models.Order.address_id == models.Address.id)\
+     .filter(models.Order.status.in_([
+         models.OrderStatus.PAID,
+         models.OrderStatus.SHIPPED,
+         models.OrderStatus.COMPLETED
+     ]))\
      .group_by(models.Address.province).all()
 
     for province, count in order_counts:

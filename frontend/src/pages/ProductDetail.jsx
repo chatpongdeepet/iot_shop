@@ -12,6 +12,7 @@ export default function ProductDetail() {
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const { addToCart } = useCart();
 
     useEffect(() => {
@@ -60,7 +61,7 @@ export default function ProductDetail() {
     if (!product) return null;
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto lg:px-40 md:px-20 px-6 py-8">
             <button
                 onClick={() => navigate(-1)}
                 className="flex items-center text-gray-600 hover:text-blue-600 mb-6 transition-colors"
@@ -71,15 +72,31 @@ export default function ProductDetail() {
 
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="md:flex">
-                    <div className="md:w-1/2 h-96 md:h-auto bg-gray-200 flex items-center justify-center">
-                        {product.image_url ? (
-                            <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="h-full w-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-gray-400 text-xl">No Image Available</span>
+                    <div className="md:w-1/2 flex flex-col items-center">
+                        <div className="h-96 w-full bg-gray-200 flex items-center justify-center mb-4 rounded-lg overflow-hidden">
+                            {product.images && product.images.length > 0 ? (
+                                <img
+                                    src={product.images[selectedImageIndex]}
+                                    alt={product.name}
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <span className="text-gray-400 text-xl">No Image Available</span>
+                            )}
+                        </div>
+                        {product.images && product.images.length > 1 && (
+                            <div className="flex space-x-2 overflow-x-auto p-2 w-full justify-center">
+                                {product.images.map((img, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setSelectedImageIndex(index)}
+                                        className={`h-20 w-20 rounded-md overflow-hidden border-2 flex-shrink-0 ${selectedImageIndex === index ? 'border-blue-600' : 'border-transparent'
+                                            }`}
+                                    >
+                                        <img src={img} alt={`Thumbnail ${index + 1}`} className="h-full w-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
                         )}
                     </div>
 

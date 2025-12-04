@@ -37,11 +37,15 @@ export default function CookieConsent() {
                         console.error('Error updating location:', error);
                     }
                 } else {
-                    try {
-                        await api.post('/analytics/visitor', { latitude, longitude });
-                        console.log('Visitor location recorded successfully');
-                    } catch (error) {
-                        console.error('Error recording visitor location:', error);
+                    // Check if we already recorded this visitor in this session
+                    if (!sessionStorage.getItem('visitorRecorded')) {
+                        try {
+                            await api.post('/analytics/visitor', { latitude, longitude });
+                            console.log('Visitor location recorded successfully');
+                            sessionStorage.setItem('visitorRecorded', 'true');
+                        } catch (error) {
+                            console.error('Error recording visitor location:', error);
+                        }
                     }
                 }
             }, (error) => {

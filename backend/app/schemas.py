@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from typing import List, Optional
 from datetime import datetime
 
@@ -58,7 +58,7 @@ class ProductBase(BaseModel):
     description: Optional[str] = None
     price: float
     stock: int
-    image_url: Optional[str] = None
+    images: List[str] = []
     category: Optional[str] = None
 
 class ProductCreate(ProductBase):
@@ -70,6 +70,15 @@ class ProductResponse(ProductBase):
 
     class Config:
         from_attributes = True
+
+    @validator('images', pre=True, check_fields=False)
+    def extract_images(cls, v):
+        if not v:
+            return []
+        # If it's a list of objects (SQLAlchemy models), extract image_url
+        if hasattr(v[0], 'image_url'):
+            return [img.image_url for img in v]
+        return v
 
 class PaginatedProductResponse(BaseModel):
     items: List[ProductResponse]

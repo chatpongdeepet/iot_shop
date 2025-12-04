@@ -1,5 +1,5 @@
 from app.database import SessionLocal
-from app.models import Product
+from app.models import Product, ProductImage
 import random
 
 def seed_products():
@@ -15,12 +15,23 @@ def seed_products():
                 description=f"This is a description for IoT Product {i}. Great for your projects.",
                 price=random.randint(100, 2000),
                 stock=random.randint(10, 100),
-                image_url=f"https://picsum.photos/seed/{i}/300/200",
                 category=category
             )
             products.append(product)
             
         db.add_all(products)
+        db.flush()
+        
+        # Add images
+        for product in products:
+            num_images = random.randint(1, 5)
+            for j in range(num_images):
+                img = ProductImage(
+                    product_id=product.id,
+                    image_url=f"https://picsum.photos/seed/{product.id}_{j}/300/200"
+                )
+                db.add(img)
+                
         db.commit()
         print("Successfully added 20 mock products.")
     except Exception as e:

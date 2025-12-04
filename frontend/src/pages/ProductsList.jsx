@@ -67,7 +67,7 @@ export default function ProductsList() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto lg:px-40 md:px-20 px-6 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <div className="relative w-full md:w-1/2">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -107,8 +107,8 @@ export default function ProductsList() {
                             <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                                 <Link to={`/product/${product.id}`} className="block">
                                     <div className="h-48 bg-gray-200 flex items-center justify-center relative">
-                                        {product.image_url ? (
-                                            <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
+                                        {product.images && product.images.length > 0 ? (
+                                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
                                         ) : (
                                             <span className="text-gray-400">No Image</span>
                                         )}
@@ -118,15 +118,21 @@ export default function ProductsList() {
                                         <p className="text-gray-600 mb-4 line-clamp-2">{product.description}</p>
                                         <div className="flex justify-between items-center">
                                             <span className="text-2xl font-bold text-blue-600">฿{product.price}</span>
-                                            <button
-                                                className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors z-10 relative"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    openQuantityModal(product);
-                                                }}
-                                            >
-                                                <ShoppingCart className="w-5 h-5" />
-                                            </button>
+                                            {product.stock > 0 ? (
+                                                <button
+                                                    className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors z-10 relative"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        openQuantityModal(product);
+                                                    }}
+                                                >
+                                                    <ShoppingCart className="w-5 h-5" />
+                                                </button>
+                                            ) : (
+                                                <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded border border-red-400 z-10 relative">
+                                                    Out of Stock
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </Link>

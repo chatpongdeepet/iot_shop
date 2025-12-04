@@ -69,8 +69,7 @@ def seed_analytics():
                 address_line=f"123 {prov['name']} Road",
                 city=prov['name'],
                 province=prov['name'],
-                zip_code="10000",
-                location=WKTElement(f'POINT({lon} {lat})', srid=4326)
+                zip_code="10000"
             )
             db.add(address)
             db.flush()
