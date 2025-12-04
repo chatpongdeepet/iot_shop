@@ -109,6 +109,8 @@ def update_product(
     db.commit()
     db.refresh(db_product)
     return db_product
+
+@router.delete("/{product_id}")
 def delete_product(
     product_id: int, 
     db: Session = Depends(get_db),

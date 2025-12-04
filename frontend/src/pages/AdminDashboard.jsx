@@ -12,9 +12,10 @@ export default function AdminDashboard() {
         description: '',
         price: '',
         stock: '',
-        image_url: '',
+        images: [],
         category: ''
     });
+    const [uploading, setUploading] = useState(false);
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
             } else {
                 await api.post('/products/', newProduct);
             }
-            setNewProduct({ name: '', description: '', price: '', stock: '', image_url: '', category: '' });
+            setNewProduct({ name: '', description: '', price: '', stock: '', images: [], category: '' });
             fetchProducts();
         } catch (error) {
             alert(isEditing ? 'Failed to update product' : 'Failed to add product');
@@ -60,7 +61,7 @@ export default function AdminDashboard() {
             description: product.description || '',
             price: product.price,
             stock: product.stock,
-            image_url: product.image_url || '',
+            images: product.images || [],
             category: product.category || ''
         });
         // Scroll to top
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
     const handleCancelEdit = () => {
         setIsEditing(false);
         setCurrentProductId(null);
-        setNewProduct({ name: '', description: '', price: '', stock: '', image_url: '', category: '' });
+        setNewProduct({ name: '', description: '', price: '', stock: '', images: [], category: '' });
     };
 
     const handleDelete = async (id) => {
@@ -84,8 +85,46 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (newProduct.images.length >= 5) {
+            alert('Maximum 5 images allowed');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        setUploading(true);
+        try {
+            const response = await api.post('/upload/image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setNewProduct(prev => ({
+                ...prev,
+                images: [...prev.images, response.data.url]
+            }));
+        } catch (error) {
+            console.error('Upload failed:', error);
+            alert('Failed to upload image');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const removeImage = (indexToRemove) => {
+        setNewProduct(prev => ({
+            ...prev,
+            images: prev.images.filter((_, index) => index !== indexToRemove)
+        }));
+    };
+
     return (
-        <div>
+        <div className="container mx-auto lg:px-40 md:px-20 px-10">
             <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
             <div className="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -120,12 +159,36 @@ export default function AdminDashboard() {
                         onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
                         className="p-2 border rounded"
                     />
-                    <input
-                        placeholder="Image URL"
-                        value={newProduct.image_url}
-                        onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })}
-                        className="p-2 border rounded md:col-span-2"
-                    />
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Images (Max 5)</label>
+                        <div className="flex flex-wrap gap-4 mb-2">
+                            {newProduct.images.map((url, index) => (
+                                <div key={index} className="relative w-24 h-24">
+                                    <img src={url} alt={`Product ${index}`} className="w-full h-full object-cover rounded" />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(index)}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                                    >
+                                        x
+                                    </button>
+                                </div>
+                            ))}
+                            {newProduct.images.length < 5 && (
+                                <label className="w-24 h-24 flex items-center justify-center border-2 border-dashed border-gray-300 rounded cursor-pointer hover:border-gray-400">
+                                    <span className="text-2xl text-gray-400">+</span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        className="hidden"
+                                        disabled={uploading}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                        {uploading && <p className="text-sm text-blue-500">Uploading...</p>}
+                    </div>
                     <textarea
                         placeholder="Description"
                         value={newProduct.description}
